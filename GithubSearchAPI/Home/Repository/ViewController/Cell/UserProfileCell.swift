@@ -26,6 +26,7 @@ final class UserProfileCell: UITableViewCell {
     
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 2
         return label
     }()
     
@@ -43,8 +44,8 @@ final class UserProfileCell: UITableViewCell {
 
     func configure(with viewModel: GithubUserViewModel) {
         titleLabel.text = viewModel.name
-        ownerLabel.text = "👤 \(viewModel.login)"
-        descriptionLabel.text = viewModel.description
+        ownerLabel.text = "🗣️ \(viewModel.login)"
+        descriptionLabel.text = "✏️ \(viewModel.description)"
         languageLabel.text = "🧠 \(viewModel.language)"
 
         avatarImageView.load(url: viewModel.avatarURL)

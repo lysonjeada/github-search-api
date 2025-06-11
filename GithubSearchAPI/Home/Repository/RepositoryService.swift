@@ -68,11 +68,12 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
                 return
             }
-
+            
             // Attempt to decode data
             do {
                 let repositories = try JSONDecoder().decode([Repository].self, from: data)
                 print("[RepositoryService] 📦 Successfully decoded \(repositories.count) repositories")
+                print(repositories)
                 DispatchQueue.main.async {
                     completion(.success(repositories))
                 }

@@ -54,7 +54,7 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(RepositoryCell.self, forCellReuseIdentifier: "RepositoryCell")
-        tableView.register(UserCell.self, forCellReuseIdentifier: "UserCell")
+        tableView.register(UserProfileCell.self, forCellReuseIdentifier: "UserProfileCell")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 250
 
@@ -71,9 +71,9 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
 
     // MARK: - RepositoryViewProtocol
 
+    // MARK: - RepositoryViewProtocol
     func displayRepositories(_ repos: [RepositoryViewModel]) {
         githubUser = nil
-        userProfile = nil
         if currentPage == 1 {
             repositories = repos
         } else {
@@ -82,7 +82,6 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         isLoading = false
         tableView.reloadData()
     }
-
 
     func displayUserProfile(_ user: GithubUserViewModel) {
         githubUser = user
@@ -140,21 +139,20 @@ extension RepositoryViewController: UISearchBarDelegate {
 
 extension RepositoryViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let userOffset = userProfile != nil ? 1 : 0
+        let userOffset = githubUser != nil ? 1 : 0 // Agora verifica githubUser
         return repositories.count + userOffset
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let user = userProfile, indexPath.row == 0 {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "UserCell", for: indexPath) as? UserCell else {
+        if let githubUser = githubUser, indexPath.row == 0 {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "UserProfileCell", for: indexPath) as? UserProfileCell else {
                 return UITableViewCell()
             }
-            guard let githubUser else { return UITableViewCell() }
             cell.configure(with: githubUser)
             return cell
         }
-
-        let repoIndex = indexPath.row - (userProfile != nil ? 1 : 0)
+        
+        let repoIndex = indexPath.row - (githubUser != nil ? 1 : 0) // Agora verifica githubUser
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "RepositoryCell", for: indexPath) as? RepositoryCell else {
             return UITableViewCell()
         }

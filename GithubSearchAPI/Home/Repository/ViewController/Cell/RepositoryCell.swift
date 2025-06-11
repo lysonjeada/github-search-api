@@ -14,19 +14,35 @@ final class RepositoryCell: UITableViewCell {
         return image
     }()
     
-    private lazy var titleLabel: UILabel = {
+    private lazy var loginLabel: UILabel = {
         let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 20) // Negrito com tamanho 16
+        label.textColor = .black // Cor preta (ou a cor primária do seu texto)
+        label.numberOfLines = 1 // Uma linha só
+        label.adjustsFontSizeToFitWidth = true // Ajusta tamanho se necessário
         return label
     }()
     
+    private lazy var repositoryLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 20) // Negrito com tamanho 16
+        label.textColor = .black // Cor preta (ou a cor primária do seu texto)
+        label.numberOfLines = 1 // Uma linha só
+        label.adjustsFontSizeToFitWidth = true // Ajusta tamanho se necessário
+        return label
+    }()
+
     private lazy var ownerLabel: UILabel = {
         let label = UILabel()
+        label.font = UIFont.italicSystemFont(ofSize: 18) // Itálico com tamanho 14
+        label.textColor = .gray // Cor cinza
+        label.numberOfLines = 1 // Uma linha só
         return label
     }()
     
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
-
+        label.numberOfLines = 2
         return label
     }()
     
@@ -43,16 +59,15 @@ final class RepositoryCell: UITableViewCell {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func configure(with viewModel: RepositoryViewModel) {
-        titleLabel.text = viewModel.repoName
-        ownerLabel.text = "👤 \(viewModel.ownerName)"
-        descriptionLabel.text = viewModel.description
+        repositoryLabel.text = viewModel.repoName
+        ownerLabel.text = "🏛️  \(viewModel.ownerName)"
+        descriptionLabel.text = "✏️ \(viewModel.description)"
         languageLabel.text = "🧠 \(viewModel.language)"
-
         avatarImageView.load(url: viewModel.avatarURL)
     }
 
     private func setupLayout() {
-        [avatarImageView, titleLabel, ownerLabel, descriptionLabel, languageLabel].forEach {
+        [avatarImageView, repositoryLabel, languageLabel, ownerLabel, descriptionLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
@@ -67,20 +82,21 @@ final class RepositoryCell: UITableViewCell {
             avatarImageView.widthAnchor.constraint(equalToConstant: 50),
             avatarImageView.heightAnchor.constraint(equalToConstant: 50),
 
-            titleLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 12),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            repositoryLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 12),
+            repositoryLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            repositoryLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
 
-            ownerLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            ownerLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            languageLabel.leadingAnchor.constraint(equalTo: repositoryLabel.leadingAnchor),
+            languageLabel.topAnchor.constraint(equalTo: repositoryLabel.bottomAnchor, constant: 4),
 
-            descriptionLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            descriptionLabel.topAnchor.constraint(equalTo: ownerLabel.bottomAnchor, constant: 4),
-            descriptionLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            ownerLabel.leadingAnchor.constraint(equalTo: languageLabel.trailingAnchor, constant: 8),
+            ownerLabel.topAnchor.constraint(equalTo: languageLabel.topAnchor),
+            ownerLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -12),
 
-            languageLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            languageLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 4),
-            languageLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
+            descriptionLabel.leadingAnchor.constraint(equalTo: repositoryLabel.leadingAnchor),
+            descriptionLabel.topAnchor.constraint(equalTo: languageLabel.bottomAnchor, constant: 8),
+            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            descriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
         ])
     }
 }
