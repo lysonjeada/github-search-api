@@ -9,11 +9,31 @@ import UIKit
 
 final class RepositoryCell: UITableViewCell {
 
-    private let avatarImageView = UIImageView()
-    private let titleLabel = UILabel()
-    private let ownerLabel = UILabel()
-    private let descriptionLabel = UILabel()
-    private let languageLabel = UILabel()
+    private lazy var avatarImageView: UIImageView = {
+        let image = UIImageView()
+        return image
+    }()
+    
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
+    private lazy var ownerLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
+    private lazy var descriptionLabel: UILabel = {
+        let label = UILabel()
+
+        return label
+    }()
+    
+    private lazy var languageLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -43,7 +63,7 @@ final class RepositoryCell: UITableViewCell {
 
         NSLayoutConstraint.activate([
             avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-            avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             avatarImageView.widthAnchor.constraint(equalToConstant: 50),
             avatarImageView.heightAnchor.constraint(equalToConstant: 50),
 

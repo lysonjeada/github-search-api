@@ -11,7 +11,7 @@ final class UserProfileCell: UITableViewCell {
 
     private lazy var avatarImageView: UIImageView = {
         let image = UIImageView()
-        return avatarImageView
+        return image
     }()
     
     private lazy var titleLabel: UILabel = {

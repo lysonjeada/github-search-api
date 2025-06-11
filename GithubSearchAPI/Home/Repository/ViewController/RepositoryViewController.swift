@@ -56,7 +56,7 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         tableView.register(RepositoryCell.self, forCellReuseIdentifier: "RepositoryCell")
         tableView.register(UserCell.self, forCellReuseIdentifier: "UserCell")
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 100
+        tableView.estimatedRowHeight = 250
 
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
