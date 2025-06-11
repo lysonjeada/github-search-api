@@ -14,8 +14,8 @@
             filePath = "GithubSearchAPI/Home/Repository/ViewController/RepositoryViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "134"
-            endingLineNumber = "134"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
             landmarkName = "performSearch()"
             landmarkType = "7">
          </BreakpointContent>
