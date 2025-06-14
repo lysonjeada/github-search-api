@@ -16,6 +16,7 @@ final class UserProfileCell: UITableViewCell {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .bold)
         return label
     }()
     
@@ -45,9 +46,10 @@ final class UserProfileCell: UITableViewCell {
     func configure(with viewModel: GithubUserViewModel) {
         titleLabel.text = viewModel.name
         ownerLabel.text = "🗣️ \(viewModel.login)"
-        descriptionLabel.text = "✏️ \(viewModel.description)"
-        languageLabel.text = "🧠 \(viewModel.language)"
-
+        descriptionLabel.text = "✏️ \(viewModel.description ?? "")"
+        if let language = viewModel.language {
+            languageLabel.text = "🧠 \(language)"
+        }
         avatarImageView.load(url: viewModel.avatarURL)
     }
 

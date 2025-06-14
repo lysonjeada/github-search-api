@@ -8,26 +8,34 @@
 import Foundation
 
 protocol RepositoryPresenterProtocol {
-    func presentRepositories(result: Result<[Repository], RepositoryError>)
+    func presentRepositories(result: Result<[Repository], RepositoryError>, isFirstPage: Bool)
     func presentUserResult(_ result: Result<GitHubUser, SearchServiceError>)
+    func presentRepositoryResult(_ result: Result<Repository, SearchServiceError>)
+    func presentError(_ error: String)
 }
 
 final class RepositoryPresenter: RepositoryPresenterProtocol {
     weak var view: RepositoryViewProtocol?
-
-    func presentRepositories(result: Result<[Repository], RepositoryError>) {
+    
+    func presentRepositories(result: Result<[Repository], RepositoryError>, isFirstPage: Bool) {
         switch result {
-        case .success(let repos):
-            let viewModels = repos.map {
+        case .success(let repositories):
+            let viewModels = repositories.map { repo in
                 RepositoryViewModel(
-                    avatarURL: $0.owner.avatarURL,
-                    repoName: $0.name,
-                    ownerName: $0.owner.login,
-                    description: $0.description ?? "Sem descrição",
-                    language: $0.language ?? "Sem linguagem"
+                    id: repo.id,
+                    name: repo.name,
+                    fullName: repo.fullName,
+                    description: repo.description ?? "No description",
+                    isPrivate: repo.isPrivate ?? false,
+                    stars: repo.stargazersCount,
+                    forks: repo.forksCount,
+                    ownerName: repo.owner.login,
+                    ownerAvatarUrl: repo.owner.avatarUrl,
+                    htmlUrl: repo.htmlUrl
                 )
             }
-            view?.displayRepositories(viewModels)
+            view?.displayRepositories(viewModels, isFirstPage: isFirstPage)
+            
         case .failure(let error):
             view?.displayError(error.localizedDescription)
         }
@@ -42,12 +50,39 @@ final class RepositoryPresenter: RepositoryPresenterProtocol {
                 name: user.name ?? "Sem nome",
                 login: user.login ?? "Sem login",
                 description: user.bio ?? "Sem biografia",
-                language: "" // opcional
+                language: "",
+                publicRepos: user.publicRepos,
+                following: user.following,
+                followers: user.followers// opcional
             )
             view?.displayUserProfile(userViewModel)
         case .failure(let error):
             view?.displayError("Erro ao buscar usuário: \(error.localizedDescription)")
         }
     }
-
+    
+    func presentRepositoryResult(_ result: Result<Repository, SearchServiceError>) {
+        switch result {
+        case .success(let repo):
+            let repositoryViewModel = RepositoryViewModel(
+                id: repo.id,
+                name: repo.name,
+                fullName: repo.fullName,
+                description: repo.description ?? "No description",
+                isPrivate: repo.isPrivate ?? false,
+                stars: repo.stargazersCount,
+                forks: repo.forksCount,
+                ownerName: repo.owner.login,
+                ownerAvatarUrl: repo.owner.avatarUrl,
+                htmlUrl: repo.htmlUrl
+            )
+            view?.displayRepository(repositoryViewModel)
+        case .failure(let error):
+            view?.displayError("Erro ao buscar usuário: \(error.localizedDescription)")
+        }
+    }
+    
+    func presentError(_ error: String) {
+        
+    }
 }

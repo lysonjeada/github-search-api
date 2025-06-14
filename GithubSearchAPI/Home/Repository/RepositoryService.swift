@@ -8,7 +8,7 @@
 import Foundation
 
 protocol RepositoryServiceProtocol {
-    func fetchRepositories(completion: @escaping (Result<[Repository], RepositoryError>) -> Void)
+    func fetchRepositories(page: Int, perPage: Int, completion: @escaping (Result<[Repository], RepositoryError>) -> Void)
 }
 
 enum RepositoryError: Error {
@@ -21,24 +21,33 @@ enum RepositoryError: Error {
 
 class RepositoryService: RepositoryServiceProtocol {
     private let session: URLSession
-    private let baseURL = URL(string: "https://api.github.com/orgs/swift/repos")
-
+    private let baseURL = "https://api.github.com/repositories"
+    
     init(session: URLSession = .shared) {
         self.session = session
     }
-
-    func fetchRepositories(completion: @escaping (Result<[Repository], RepositoryError>) -> Void) {
-        guard let url = baseURL else {
-            print("[RepositoryService] ❌ Invalid URL")
-            DispatchQueue.main.async {
-                completion(.failure(.invalidURL))
-            }
+    
+    func fetchRepositories(page: Int, perPage: Int = 7, completion: @escaping (Result<[Repository], RepositoryError>) -> Void) {
+        var components = URLComponents(string: baseURL)
+        components?.queryItems = [
+            URLQueryItem(name: "page", value: "\(page)"),
+            URLQueryItem(name: "per_page", value: "\(perPage)"),
+            URLQueryItem(name: "sort", value: "updated")
+        ]
+        guard let url = components?.url else {
+            completion(.failure(.invalidURL))
             return
         }
-
-        let request = URLRequest(url: url)
+        
+        var request = URLRequest(url: url)
         print("[RepositoryService] 🌐 Starting request to: \(url.absoluteString)")
-
+        
+        if let token = ProcessInfo.processInfo.environment["GITHUB_TOKEN"] {
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        } else {
+            print("Token não encontrado. Configure no esquema.")
+        }
+        
         let task = session.dataTask(with: request) { data, response, error in
             // Log networking error
             if let error = error {
@@ -48,7 +57,7 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
                 return
             }
-
+            
             // Log invalid response
             guard let httpResponse = response as? HTTPURLResponse else {
                 print("[RepositoryService] ❌ Invalid HTTP response")
@@ -57,9 +66,9 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
                 return
             }
-
+            
             print("[RepositoryService] ✅ Response status code: \(httpResponse.statusCode)")
-
+            
             // Log missing data
             guard let data = data else {
                 print("[RepositoryService] ❌ No data received")
@@ -84,7 +93,7 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
             }
         }
-
+        
         task.resume()
     }
 }

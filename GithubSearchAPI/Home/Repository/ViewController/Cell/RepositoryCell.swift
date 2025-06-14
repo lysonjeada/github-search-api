@@ -59,11 +59,11 @@ final class RepositoryCell: UITableViewCell {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func configure(with viewModel: RepositoryViewModel) {
-        repositoryLabel.text = viewModel.repoName
-        ownerLabel.text = "🏛️  \(viewModel.ownerName)"
-        descriptionLabel.text = "✏️ \(viewModel.description)"
-        languageLabel.text = "🧠 \(viewModel.language)"
-        avatarImageView.load(url: viewModel.avatarURL)
+        repositoryLabel.text = viewModel.name
+        ownerLabel.text = " 👤 \(viewModel.ownerName ?? "")"
+        descriptionLabel.text = "✏️ \(viewModel.description ?? "")"
+        languageLabel.text = viewModel.isPrivate ?? false ? "🔐 Privado" : "🔓 Público"
+        avatarImageView.load(url: viewModel.ownerAvatarUrl)
     }
 
     private func setupLayout() {
