@@ -64,7 +64,10 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
     }
     
     private func setupUI() {
-        title = "Swift Repositories"
+        title = "Repositories"
+        navigationItem.largeTitleDisplayMode = .never // Título pequeno e alinhado ao topo
+        navigationController?.navigationBar.prefersLargeTitles = false // Desativa títulos grandes
+        
         view.backgroundColor = .white
         
         // Configura os textFields com estilo de busca
@@ -79,7 +82,7 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         repositoryTextField.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         // Search Button
-        searchButton.setTitle("Buscar Repositório", for: .normal)
+        searchButton.setTitle("Search Repository", for: .normal)
         searchButton.addTarget(self, action: #selector(searchRepository), for: .touchUpInside)
         
         let divider = UIView()
@@ -104,7 +107,7 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         tableView.estimatedRowHeight = 250
         
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0), // Removido o espaçamento extra
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
@@ -114,7 +117,6 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
-    
     
     private func configureSearchStyle(for textField: UITextField, placeholder: String) {
         textField.placeholder = placeholder
