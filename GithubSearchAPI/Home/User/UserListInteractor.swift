@@ -61,7 +61,13 @@ final class UserListInteractor: UserListInteractorProtocol {
     func searchUser(username: String) {
         searchService.searchUser(username: username) { [weak self] result in
             DispatchQueue.main.async {
-                self?.presenter.presentUserResult(result)
+                switch result {
+                case .success(let success):
+                    self?.presenter.presentUserResult(result)
+                case .failure(let failure):
+                    self?.presenter.presentError(failure)
+                }
+                
             }
         }
     }

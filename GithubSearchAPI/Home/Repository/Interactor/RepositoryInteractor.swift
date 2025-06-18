@@ -55,9 +55,5 @@ final class RepositoryInteractor: RepositoryInteractorProtocol {
                 self?.presenter.presentRepositoryResult(result)
             }
         }
-        // Chame o serviço de API que busca um repositório específico
-        // Exemplo: repositoryService.fetchRepository(owner: owner, repoName: repoName) { ... }
     }
-
 }
-

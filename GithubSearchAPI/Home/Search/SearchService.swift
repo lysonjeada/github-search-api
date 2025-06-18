@@ -20,6 +20,7 @@ enum SearchServiceError: Error {
     case invalidResponse
     case noData
     case decodingError(Error)
+    case notFound
 }
 
 class SearchService: SearchServiceProtocol {
@@ -65,6 +66,17 @@ class SearchService: SearchServiceProtocol {
                 DispatchQueue.main.async {
                     completion(.failure(.invalidResponse))
                 }
+                return
+            }
+            
+            switch httpResponse.statusCode {
+            case 200:
+                break
+            case 404:
+                DispatchQueue.main.async { completion(.failure(.notFound)) }
+                return
+            default:
+                DispatchQueue.main.async { completion(.failure(.invalidResponse)) }
                 return
             }
 

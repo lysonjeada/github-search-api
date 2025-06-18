@@ -7,17 +7,137 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "322CAC2A-32D9-4DA1-BBEF-1F0D3602974E"
-            shouldBeEnabled = "Yes"
+            uuid = "2F5A32C3-965C-4B40-809C-EC83F7368D6B"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "GithubSearchAPI/Home/Repository/Presenter/RepositoryPresenter.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "45"
-            endingLineNumber = "45"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "presentRepositoryResult(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "07B0ABBE-1D6F-4DE8-BE04-2091147EFF27"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GithubSearchAPI/Home/User/UserListPresenter.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
             landmarkName = "presentUserResult(_:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "07B0ABBE-1D6F-4DE8-BE04-2091147EFF27 - cc57be99a6e82f05"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "GithubSearchAPI.UserListPresenter.presentUserResult(Swift.Result&lt;GithubSearchAPI.GitHubUser, GithubSearchAPI.SearchServiceError&gt;) -&gt; ()"
+                  moduleName = "GithubSearchAPI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/amaryllisbaldrez/Documents/github-search-api/GithubSearchAPI/GithubSearchAPI/Home/User/UserListPresenter.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41">
+               </Location>
+               <Location
+                  uuid = "07B0ABBE-1D6F-4DE8-BE04-2091147EFF27 - cc57be99a6e82f05"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "GithubSearchAPI.UserListPresenter.presentUserResult(Swift.Result&lt;GithubSearchAPI.GitHubUser, GithubSearchAPI.SearchServiceError&gt;) -&gt; ()"
+                  moduleName = "GithubSearchAPI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/amaryllisbaldrez/Documents/github-search-api/GithubSearchAPI/GithubSearchAPI/Home/User/UserListPresenter.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41">
+               </Location>
+               <Location
+                  uuid = "07B0ABBE-1D6F-4DE8-BE04-2091147EFF27 - cc57be99a6e82f05"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "GithubSearchAPI.UserListPresenter.presentUserResult(Swift.Result&lt;GithubSearchAPI.GitHubUser, GithubSearchAPI.SearchServiceError&gt;) -&gt; ()"
+                  moduleName = "GithubSearchAPI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/amaryllisbaldrez/Documents/github-search-api/GithubSearchAPI/GithubSearchAPI/Home/User/UserListPresenter.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2A1A36FE-4BA3-452B-9BE1-77661E028B07"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GithubSearchAPI/Home/User/UserListInteractor.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "62"
+            endingLineNumber = "62"
+            landmarkName = "searchUser(username:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "2A1A36FE-4BA3-452B-9BE1-77661E028B07 - 4f37fd70516e9372"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "GithubSearchAPI.UserListInteractor.searchUser(username: Swift.String) -&gt; ()"
+                  moduleName = "GithubSearchAPI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/amaryllisbaldrez/Documents/github-search-api/GithubSearchAPI/GithubSearchAPI/Home/User/UserListInteractor.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "62"
+                  endingLineNumber = "62">
+               </Location>
+               <Location
+                  uuid = "2A1A36FE-4BA3-452B-9BE1-77661E028B07 - b109015814ac20e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;GithubSearchAPI.GitHubUser, GithubSearchAPI.SearchServiceError&gt;) -&gt; () in GithubSearchAPI.UserListInteractor.searchUser(username: Swift.String) -&gt; ()"
+                  moduleName = "GithubSearchAPI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/amaryllisbaldrez/Documents/github-search-api/GithubSearchAPI/GithubSearchAPI/Home/User/UserListInteractor.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "62"
+                  endingLineNumber = "62">
+               </Location>
+               <Location
+                  uuid = "2A1A36FE-4BA3-452B-9BE1-77661E028B07 - 4cc4a1ff1a44330b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Swift.MainActor () -&gt; () in closure #1 (Swift.Result&lt;GithubSearchAPI.GitHubUser, GithubSearchAPI.SearchServiceError&gt;) -&gt; () in GithubSearchAPI.UserListInteractor.searchUser(username: Swift.String) -&gt; ()"
+                  moduleName = "GithubSearchAPI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/amaryllisbaldrez/Documents/github-search-api/GithubSearchAPI/GithubSearchAPI/Home/User/UserListInteractor.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "62"
+                  endingLineNumber = "62">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

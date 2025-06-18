@@ -15,6 +15,7 @@ enum UserError: Error {
     case invalidURL
     case requestFailed(Error)
     case invalidResponse
+    case notFound
     case invalidData
     case decodingError(Error)
 }
@@ -56,7 +57,18 @@ final class UserService: UserServiceProtocol {
                 return
             }
             
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                DispatchQueue.main.async { completion(.failure(.invalidResponse)) }
+                return
+            }
+
+            switch httpResponse.statusCode {
+            case 200:
+                break 
+            case 404:
+                DispatchQueue.main.async { completion(.failure(.notFound)) }
+                return
+            default:
                 DispatchQueue.main.async { completion(.failure(.invalidResponse)) }
                 return
             }

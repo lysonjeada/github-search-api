@@ -17,7 +17,7 @@ final class RepositoryCell: UITableViewCell {
     private lazy var loginLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 20) // Negrito com tamanho 16
-        label.textColor = .black // Cor preta (ou a cor primária do seu texto)
+        label.textColor = .label // Cor preta (ou a cor primária do seu texto)
         label.numberOfLines = 1 // Uma linha só
         label.adjustsFontSizeToFitWidth = true // Ajusta tamanho se necessário
         return label
@@ -26,7 +26,7 @@ final class RepositoryCell: UITableViewCell {
     private lazy var repositoryLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 20) // Negrito com tamanho 16
-        label.textColor = .black // Cor preta (ou a cor primária do seu texto)
+        label.textColor = .label // Cor preta (ou a cor primária do seu texto)
         label.numberOfLines = 1 // Uma linha só
         label.adjustsFontSizeToFitWidth = true // Ajusta tamanho se necessário
         return label
@@ -35,7 +35,7 @@ final class RepositoryCell: UITableViewCell {
     private lazy var ownerLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.italicSystemFont(ofSize: 18) // Itálico com tamanho 14
-        label.textColor = .gray // Cor cinza
+        label.textColor = .systemGray // Cor cinza
         label.numberOfLines = 1 // Uma linha só
         return label
     }()

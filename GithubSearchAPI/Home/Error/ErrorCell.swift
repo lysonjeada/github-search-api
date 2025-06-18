@@ -21,7 +21,7 @@ final class ErrorCell: UITableViewCell {
     
     private lazy var messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "A busca não retornou resultados"
+        label.text = "The search returned no results"
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         label.textAlignment = .center
         label.numberOfLines = 0

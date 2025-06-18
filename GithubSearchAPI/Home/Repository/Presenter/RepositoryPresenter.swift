@@ -47,9 +47,9 @@ final class RepositoryPresenter: RepositoryPresenterProtocol {
             guard let url = URL(string: user.avatarURL ?? "") else { return }
             let userViewModel = GithubUserViewModel(
                 avatarURL: url,
-                name: user.name ?? "Sem nome",
-                login: user.login ?? "Sem login",
-                description: user.bio ?? "Sem biografia",
+                name: user.name ?? "No name",
+                login: user.login ?? "No login",
+                description: user.bio ?? "Without biography",
                 language: "",
                 publicRepos: user.publicRepos,
                 following: user.following,
@@ -57,7 +57,7 @@ final class RepositoryPresenter: RepositoryPresenterProtocol {
             )
             view?.displayUserProfile(userViewModel)
         case .failure(let error):
-            view?.displayError("Erro ao buscar usuário: \(error.localizedDescription)")
+            view?.displayError("We don't found any user, sorry: \(error.localizedDescription)")
         }
     }
     
@@ -78,7 +78,7 @@ final class RepositoryPresenter: RepositoryPresenterProtocol {
             )
             view?.displayRepository(repositoryViewModel)
         case .failure(let error):
-            view?.displayError("Erro ao buscar usuário: \(error.localizedDescription)")
+            view?.displayError("We don't found any repository, sorry: \(error.localizedDescription)")
         }
     }
     

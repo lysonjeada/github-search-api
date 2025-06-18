@@ -9,7 +9,7 @@ import UIKit
 
 protocol UserListViewProtocol: AnyObject {
     func displayUsers(_ newUsers: [GithubUserViewModel], isFirstPage: Bool)
-    func displayError(_ message: String)
+    func displayError()
     func displayUserProfile(_ user: GithubUserViewModel)
 }
 
@@ -21,19 +21,21 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
     private var currentPage = 1
     private let interactor: UserListInteractorProtocol
     private var githubUser: GithubUserViewModel?
+    private var showErrorCell = false
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UserProfileCell.self, forCellReuseIdentifier: "UserProfileCell")
+        tableView.register(ErrorCell.self, forCellReuseIdentifier: ErrorCell.reuseIdentifier)
         return tableView
     }()
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.delegate = self
-        searchBar.placeholder = "Buscar repositórios ou usuário"
+        searchBar.placeholder = "Search users"
         searchBar.searchBarStyle = .minimal
         searchBar.backgroundImage = UIImage()
         searchBar.layer.shadowColor = UIColor.black.cgColor
@@ -91,6 +93,7 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
     // MARK: - UserListViewProtocol
     
     func displayUsers(_ newUsers: [GithubUserViewModel], isFirstPage: Bool) {
+        showErrorCell = false
         if isFirstPage {
             users = newUsers
         } else {
@@ -100,22 +103,22 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         hasMoreData = !newUsers.isEmpty
         tableView.reloadData()
     }
-    
-    func displayError(_ message: String) {
-        isLoading = false
-        let alert = UIAlertController(title: "Erro", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
-    
+
     func displayUserProfile(_ user: GithubUserViewModel) {
+        showErrorCell = false
         currentPage = 1
         users = [user]
         isLoading = false
         hasMoreData = false
         tableView.reloadData()
     }
-
+    
+    func displayError() {
+        isLoading = false
+        users = []
+        showErrorCell = true
+        tableView.reloadData()
+    }
 }
 
 extension UserListViewController: UISearchBarDelegate {
@@ -150,10 +153,20 @@ extension UserListViewController: UISearchBarDelegate {
 
 extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        users.count
+        if showErrorCell && users.isEmpty {
+            return 1
+        }
+        return users.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if showErrorCell && users.isEmpty {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ErrorCell.reuseIdentifier, for: indexPath) as? ErrorCell else {
+                return UITableViewCell()
+            }
+            return cell
+        }
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "UserProfileCell", for: indexPath) as? UserProfileCell else {
             return UITableViewCell()
         }
@@ -178,4 +191,12 @@ extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
         navigationController?.pushViewController(detailVC, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if showErrorCell && users.isEmpty {
+            return 200 // ou outro valor para a altura da célula de erro
+        }
+        return UITableView.automaticDimension
+    }
+
 }

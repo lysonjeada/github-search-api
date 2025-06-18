@@ -24,6 +24,8 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
     private var showErrorCell = false
     var interactor: RepositoryInteractorProtocol
     
+    private var loadingView: LoadingView?
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -60,6 +62,8 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        isLoading = true
+        showLoading()
         interactor.loadInitialRepositories()
     }
     
@@ -68,7 +72,7 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         navigationItem.largeTitleDisplayMode = .never // Título pequeno e alinhado ao topo
         navigationController?.navigationBar.prefersLargeTitles = false // Desativa títulos grandes
         
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         // Configura os textFields com estilo de busca
         configureSearchStyle(for: ownerTextField, placeholder: "Username")
@@ -167,27 +171,31 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
     // MARK: - RepositoryViewProtocol
     
     func displayRepositories(_ newRepositories: [RepositoryViewModel], isFirstPage: Bool) {
-        repositories = isFirstPage ? newRepositories : repositories + newRepositories
         isLoading = false
+        hideLoading()
+        repositories = isFirstPage ? newRepositories : repositories + newRepositories
         tableView.reloadData()
     }
     
     func displayUserProfile(_ user: GithubUserViewModel) {
+        isLoading = false
+        hideLoading()
         githubUser = user
         repositories = []
-        isLoading = false
         tableView.reloadData()
     }
     
     func displayRepository(_ repository: RepositoryViewModel) {
+        isLoading = false
+        hideLoading()
         githubUser = nil
         repositories = [repository]
-        isLoading = false
         tableView.reloadData()
     }
     
     func displayError(_ message: String) {
         isLoading = false
+        hideLoading()
         repositories = []
         githubUser = nil
         showErrorCell = true
@@ -208,6 +216,20 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
             tableView.reloadData()
         }
     }
+    
+    private func showLoading() {
+        if loadingView == nil {
+            let loading = LoadingView(frame: view.bounds)
+            view.addSubview(loading)
+            loadingView = loading
+        }
+    }
+
+    private func hideLoading() {
+        loadingView?.removeFromSuperview()
+        loadingView = nil
+    }
+
 }
 
 extension RepositoryViewController: UITextFieldDelegate {

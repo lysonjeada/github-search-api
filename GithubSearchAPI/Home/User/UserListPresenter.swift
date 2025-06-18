@@ -33,25 +33,7 @@ final class UserListPresenter: UserListPresentationLogic {
     }
 
     func presentError(_ error: Error) {
-        let errorMessage: String
-        if let userError = error as? UserError {
-            switch userError {
-            case .invalidURL:
-                errorMessage = "URL inválida."
-            case .requestFailed(let innerError):
-                errorMessage = "Erro na requisição: \(innerError.localizedDescription)"
-            case .invalidResponse:
-                errorMessage = "Resposta inválida do servidor."
-            case .invalidData:
-                errorMessage = "Dados inválidos recebidos."
-            case .decodingError(let decodeError):
-                errorMessage = "Erro ao decodificar os dados: \(decodeError.localizedDescription)"
-            }
-        } else {
-            errorMessage = error.localizedDescription
-        }
-
-        viewController?.displayError(errorMessage)
+        viewController?.displayError()
     }
     
     func presentUserResult(_ result: Result<GitHubUser, SearchServiceError>) {
@@ -70,7 +52,7 @@ final class UserListPresenter: UserListPresentationLogic {
             )
             viewController?.displayUserProfile(userViewModel)
         case .failure(let error):
-            viewController?.displayError("Erro ao buscar usuário: \(error.localizedDescription)")
+            viewController?.displayError()
         }
     }
 }
