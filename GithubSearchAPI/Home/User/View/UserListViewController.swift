@@ -67,16 +67,31 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "GitHub Users"
+        navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: UIColor.label
+        ]
         setupUI()
         interactor.loadInitialUsers()
     }
-    
-    private func setupUI() {
-        navigationItem.titleView = searchBar
 
+    private func setupUI() {
         title = "GitHub Users"
-        view.backgroundColor = .white
-        
+        navigationController?.navigationBar.titleTextAttributes = [
+            .foregroundColor: UIColor.label
+        ]
+        view.backgroundColor = .systemBackground
+
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 56))
+        headerView.addSubview(searchBar)
+        NSLayoutConstraint.activate([
+            searchBar.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 8),
+            searchBar.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -8),
+            searchBar.topAnchor.constraint(equalTo: headerView.topAnchor),
+            searchBar.bottomAnchor.constraint(equalTo: headerView.bottomAnchor)
+        ])
+        tableView.tableHeaderView = headerView
 
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -88,6 +103,7 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
+
 
     
     // MARK: - UserListViewProtocol
