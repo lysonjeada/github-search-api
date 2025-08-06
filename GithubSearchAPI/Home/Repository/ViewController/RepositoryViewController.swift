@@ -69,23 +69,20 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
     
     private func setupUI() {
         title = "Repositories"
-        navigationItem.largeTitleDisplayMode = .never // Título pequeno e alinhado ao topo
-        navigationController?.navigationBar.prefersLargeTitles = false // Desativa títulos grandes
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
         
         view.backgroundColor = .systemBackground
         
-        // Configura os textFields com estilo de busca
         configureSearchStyle(for: ownerTextField, placeholder: "Username")
         configureSearchStyle(for: repositoryTextField, placeholder: "Repository name")
         
         addClearButton(to: ownerTextField)
         addClearButton(to: repositoryTextField)
         
-        // Aumentar altura dos textFields
         ownerTextField.heightAnchor.constraint(equalToConstant: 40).isActive = true
         repositoryTextField.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
-        // Search Button
         searchButton.setTitle("Search Repository", for: .normal)
         searchButton.addTarget(self, action: #selector(searchRepository), for: .touchUpInside)
         
@@ -111,7 +108,7 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         tableView.estimatedRowHeight = 250
         
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0), // Removido o espaçamento extra
+            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
@@ -128,14 +125,11 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         textField.backgroundColor = .systemGray6
         textField.layer.cornerRadius = 10
         textField.layer.masksToBounds = false
-        
-        // Sombra
         textField.layer.shadowColor = UIColor.black.cgColor
         textField.layer.shadowOpacity = 0.1
         textField.layer.shadowOffset = CGSize(width: 0, height: 1)
         textField.layer.shadowRadius = 4
         
-        // Ícone de lupa no leftView
         let searchIcon = UIImageView(image: UIImage(systemName: "magnifyingglass"))
         searchIcon.tintColor = .gray
         searchIcon.contentMode = .scaleAspectFit
@@ -229,20 +223,16 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
         loadingView?.removeFromSuperview()
         loadingView = nil
     }
-
 }
 
 extension RepositoryViewController: UITextFieldDelegate {
-    // ... (código existente permanece o mesmo até o método searchRepository)
     
     @objc private func searchRepository() {
         let isOwnerEmpty = ownerTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
         let isRepoEmpty = repositoryTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
         
-        // Ativa o modo de highlight para campos vazios
         shouldHighlightEmptyFields = true
         
-        // Atualiza a aparência dos campos
         updateTextFieldAppearance(ownerTextField, isEmpty: isOwnerEmpty)
         updateTextFieldAppearance(repositoryTextField, isEmpty: isRepoEmpty)
         
@@ -250,7 +240,6 @@ extension RepositoryViewController: UITextFieldDelegate {
             return
         }
         
-        // Se chegou aqui, os campos estão preenchidos
         shouldHighlightEmptyFields = false
         isLoading = true
         githubUser = nil
@@ -263,18 +252,15 @@ extension RepositoryViewController: UITextFieldDelegate {
     // MARK: - UITextFieldDelegate
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        // Quando começa a editar, remove o destaque vermelho
         updateTextFieldAppearance(textField, isEmpty: false)
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
         checkIfFieldsAreEmpty()
-        // Só atualiza a aparência se estivermos no modo de highlight
         let isEmpty = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
         updateTextFieldAppearance(textField, isEmpty: shouldHighlightEmptyFields && isEmpty)
     }
     
-    // Método para atualizar a aparência do text field
     private func updateTextFieldAppearance(_ textField: UITextField, isEmpty: Bool) {
         if isEmpty {
             textField.layer.borderWidth = 1.0
@@ -294,7 +280,7 @@ extension RepositoryViewController: UITextFieldDelegate {
             repositoryTextField.text = ""
         }
         checkIfFieldsAreEmpty()
-        // Ao limpar o campo, não ativa o highlight
+
         updateTextFieldAppearance(ownerTextField, isEmpty: false)
         updateTextFieldAppearance(repositoryTextField, isEmpty: false)
     }
@@ -305,7 +291,7 @@ extension RepositoryViewController: UITextFieldDelegate {
 extension RepositoryViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if showErrorCell && repositories.isEmpty && githubUser == nil {
-            return 1 // Mostra apenas a célula de erro
+            return 1
         }
         
         let userOffset = githubUser != nil ? 1 : 0
@@ -338,7 +324,7 @@ extension RepositoryViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if showErrorCell && repositories.isEmpty && githubUser == nil {
-            return 200 // Altura da célula de erro
+            return 200
         }
         return UITableView.automaticDimension
     }

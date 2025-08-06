@@ -8,7 +8,7 @@
 import Foundation
 
 protocol RepositoryPresenterProtocol {
-    func presentRepositories(result: Result<[Repository], RepositoryError>, isFirstPage: Bool)
+    func presentRepositories(repositories: [Repository], isFirstPage: Bool)
     func presentUserResult(_ result: Result<GitHubUser, SearchServiceError>)
     func presentRepositoryResult(_ result: Result<Repository, SearchServiceError>)
     func presentError(_ error: String)
@@ -17,28 +17,22 @@ protocol RepositoryPresenterProtocol {
 final class RepositoryPresenter: RepositoryPresenterProtocol {
     weak var view: RepositoryViewProtocol?
     
-    func presentRepositories(result: Result<[Repository], RepositoryError>, isFirstPage: Bool) {
-        switch result {
-        case .success(let repositories):
-            let viewModels = repositories.map { repo in
-                RepositoryViewModel(
-                    id: repo.id,
-                    name: repo.name,
-                    fullName: repo.fullName,
-                    description: repo.description ?? "No description",
-                    isPrivate: repo.isPrivate ?? false,
-                    stars: repo.stargazersCount,
-                    forks: repo.forksCount,
-                    ownerName: repo.owner.login,
-                    ownerAvatarUrl: repo.owner.avatarUrl,
-                    htmlUrl: repo.htmlUrl
-                )
-            }
-            view?.displayRepositories(viewModels, isFirstPage: isFirstPage)
-            
-        case .failure(let error):
-            view?.displayError(error.localizedDescription)
+    func presentRepositories(repositories: [Repository], isFirstPage: Bool) {
+        let viewModels = repositories.map { repo in
+            RepositoryViewModel(
+                id: repo.id,
+                name: repo.name,
+                fullName: repo.fullName,
+                description: repo.description ?? "No description",
+                isPrivate: repo.isPrivate ?? false,
+                stars: repo.stargazersCount,
+                forks: repo.forksCount,
+                ownerName: repo.owner.login,
+                ownerAvatarUrl: repo.owner.avatarUrl,
+                htmlUrl: repo.htmlUrl
+            )
         }
+        view?.displayRepositories(viewModels, isFirstPage: isFirstPage)
     }
     
     func presentUserResult(_ result: Result<GitHubUser, SearchServiceError>) {
@@ -57,8 +51,9 @@ final class RepositoryPresenter: RepositoryPresenterProtocol {
             )
             view?.displayUserProfile(userViewModel)
         case .failure(let error):
-            view?.displayError("We don't found any user, sorry: \(error.localizedDescription)")
+            view?.displayError("We don't found any repository, sorry: \(error.localizedDescription)")
         }
+        
     }
     
     func presentRepositoryResult(_ result: Result<Repository, SearchServiceError>) {

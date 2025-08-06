@@ -20,6 +20,8 @@ final class RepositoryInteractor: RepositoryInteractorProtocol {
     var presenter: RepositoryPresenterProtocol
     private var currentPage = 1
     private let itemsPerPage = 5
+    private var isLoading = false
+    private var hasMoreData = true
     
     init(service: RepositoryServiceProtocol, searchService: SearchServiceProtocol, presenter: RepositoryPresenterProtocol) {
         self.service = service
@@ -30,14 +32,31 @@ final class RepositoryInteractor: RepositoryInteractorProtocol {
     func loadInitialRepositories() {
         currentPage = 1
         service.fetchRepositories(page: currentPage, perPage: itemsPerPage) { [weak self] result in
-            self?.presenter.presentRepositories(result: result, isFirstPage: true)
+            guard let self = self else { return }
+            switch result {
+            case .success(let repositories):
+                self.presenter.presentRepositories(repositories: repositories, isFirstPage: true)
+            case .failure(let failure):
+                self.presenter.presentError(failure.localizedDescription)
+            }
         }
     }
     
     func loadMoreRepositories() {
+        guard !isLoading, hasMoreData else { return }
         currentPage += 1
         service.fetchRepositories(page: currentPage, perPage: itemsPerPage) { [weak self] result in
-            self?.presenter.presentRepositories(result: result, isFirstPage: false)
+            guard let self = self else { return }
+            self.isLoading = false
+            switch result {
+            case .success(let repositories):
+                if repositories.isEmpty {
+                    self.hasMoreData = false
+                }
+                self.presenter.presentRepositories(repositories: repositories, isFirstPage: false)
+            case .failure(let error):
+                self.presenter.presentError(error.localizedDescription)
+            }
         }
     }
     
