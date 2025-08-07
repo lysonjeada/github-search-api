@@ -79,13 +79,125 @@ final class UserService: UserServiceProtocol {
             }
             
             do {
-                let users = try JSONDecoder().decode([GitHubUser].self, from: data)
-                DispatchQueue.main.async { completion(.success(users)) }
+                var users = try JSONDecoder().decode([GitHubUser].self, from: data)
+                
+                let group = DispatchGroup()
+
+                for index in users.indices {
+                    if let reposUrl = users[index].reposURL {
+                        group.enter()
+                        self.fetchRepos(from: reposUrl) { result in
+                            switch result {
+                            case .success(let repos):
+                                users[index].repos = repos
+                            case .failure(let failure):
+                                users[index].repos = []
+                            }
+                            
+                            group.leave()
+                        }
+                    }
+                }
+
+                group.notify(queue: .main) {
+                    print("[RepositoryService] ✅ All repos fetched")
+                    completion(.success(users))
+                }
             } catch {
                 DispatchQueue.main.async { completion(.failure(.decodingError(error))) }
             }
         }
         
         task.resume()
+    }
+}
+
+extension UserService {
+    func fetchRepos(from urlString: String, completion: @escaping (Result<[RepositoryOwnerr], UserError>) -> Void) {
+        guard let url = URL(string: urlString) else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+
+        if let token = ProcessInfo.processInfo.environment["GITHUB_TOKEN"] {
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        session.dataTask(with: request) { data, response, error in
+            guard
+                let data = data,
+                let result = try? JSONDecoder().decode([RepositoryOwnerr].self, from: data)
+            else {
+                completion(.failure(.decodingError(error ?? NSError(domain: "", code: 0, userInfo: nil))))
+                return
+            }
+
+            completion(.success(result))
+        }.resume()
+    }
+}
+
+import Foundation
+
+// MARK: - Owner
+struct RepositoryOwnerr: Codable {
+    let login: String?
+    let id: Int?
+    let nodeID: String?
+    let avatarURL: String?
+    let gravatarID: String?
+    let url: String?
+    let htmlURL: String?
+    let followersURL: String?
+    let followingURL: String?
+    let gistsURL: String?
+    let starredURL: String?
+    let subscriptionsURL: String?
+    let organizationsURL: String?
+    let reposURL: String?
+    let eventsURL: String?
+    let receivedEventsURL: String?
+    let type: String?
+    let userViewType: String?
+    let siteAdmin: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case login, id
+        case nodeID = "node_id"
+        case avatarURL = "avatar_url"
+        case gravatarID = "gravatar_id"
+        case url
+        case htmlURL = "html_url"
+        case followersURL = "followers_url"
+        case followingURL = "following_url"
+        case gistsURL = "gists_url"
+        case starredURL = "starred_url"
+        case subscriptionsURL = "subscriptions_url"
+        case organizationsURL = "organizations_url"
+        case reposURL = "repos_url"
+        case eventsURL = "events_url"
+        case receivedEventsURL = "received_events_url"
+        case type
+        case userViewType = "user_view_type"
+        case siteAdmin = "site_admin"
+    }
+}
+
+// MARK: - License
+struct License: Codable {
+    let key: String?
+    let name: String?
+    let spdxID: String?
+    let url: String?
+    let nodeID: String?
+
+    enum CodingKeys: String, CodingKey {
+        case key, name
+        case spdxID = "spdx_id"
+        case url
+        case nodeID = "node_id"
     }
 }

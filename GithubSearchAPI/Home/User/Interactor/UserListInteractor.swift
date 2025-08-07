@@ -63,7 +63,7 @@ final class UserListInteractor: UserListInteractorProtocol {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let success):
-                    self?.presenter.presentUserResult(result)
+                    self?.presenter.presentUserResult(success)
                 case .failure(let failure):
                     self?.presenter.presentError(failure)
                 }

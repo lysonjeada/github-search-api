@@ -68,7 +68,7 @@ final class RepositoryViewController: UIViewController, RepositoryViewProtocol {
     }
     
     private func setupUI() {
-        title = "Repositories"
+        title = "Public repositories"
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = false
         

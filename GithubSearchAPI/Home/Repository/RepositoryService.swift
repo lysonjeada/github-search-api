@@ -27,29 +27,30 @@ class RepositoryService: RepositoryServiceProtocol {
         self.session = session
     }
     
-    func fetchRepositories(page: Int, perPage: Int = 7, completion: @escaping (Result<[Repository], RepositoryError>) -> Void) {
+    func fetchRepositories(page: Int, perPage: Int = 4, completion: @escaping (Result<[Repository], RepositoryError>) -> Void) {
         var components = URLComponents(string: baseURL)
         components?.queryItems = [
-            URLQueryItem(name: "page", value: "\(page)"),
-            URLQueryItem(name: "per_page", value: "\(perPage)"),
-            URLQueryItem(name: "sort", value: "updated")
+            URLQueryItem(name: "since", value: "\((page - 1) * perPage)"),
+            URLQueryItem(name: "per_page", value: "\(perPage)")
         ]
+        
         guard let url = components?.url else {
             completion(.failure(.invalidURL))
             return
         }
-        
+
         var request = URLRequest(url: url)
-        print("[RepositoryService] 🌐 Starting request to: \(url.absoluteString)")
-        
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+
         if let token = ProcessInfo.processInfo.environment["GITHUB_TOKEN"] {
             request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         } else {
-            print("Token não encontrado. Configure no esquema.")
+            print("[RepositoryService] ⚠️ Token não encontrado. Configure no esquema.")
         }
-        
+
+        print("[RepositoryService] 🌐 Starting request to: \(url.absoluteString)")
+
         let task = session.dataTask(with: request) { data, response, error in
-            // Log networking error
             if let error = error {
                 print("[RepositoryService] ❌ Request failed with error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
@@ -57,8 +58,7 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
                 return
             }
-            
-            // Log invalid response
+
             guard let httpResponse = response as? HTTPURLResponse else {
                 print("[RepositoryService] ❌ Invalid HTTP response")
                 DispatchQueue.main.async {
@@ -66,10 +66,9 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
                 return
             }
-            
+
             print("[RepositoryService] ✅ Response status code: \(httpResponse.statusCode)")
-            
-            // Log missing data
+
             guard let data = data else {
                 print("[RepositoryService] ❌ No data received")
                 DispatchQueue.main.async {
@@ -77,15 +76,28 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
                 return
             }
-            
-            // Attempt to decode data
+
             do {
-                let repositories = try JSONDecoder().decode([Repository].self, from: data)
-                print("[RepositoryService] 📦 Successfully decoded \(repositories.count) repositories")
-                print(repositories)
-                DispatchQueue.main.async {
+                var repositories = try JSONDecoder().decode([Repository].self, from: data)
+                print("[RepositoryService] 📦 Decoded \(repositories.count) repositories")
+
+                let group = DispatchGroup()
+
+                for index in repositories.indices {
+                    if let languagesUrl = repositories[index].languagesUrl {
+                        group.enter()
+                        self.fetchLanguages(from: languagesUrl) { languages in
+                            repositories[index].languages = languages
+                            group.leave()
+                        }
+                    }
+                }
+
+                group.notify(queue: .main) {
+                    print("[RepositoryService] ✅ All languages fetched")
                     completion(.success(repositories))
                 }
+
             } catch {
                 print("[RepositoryService] ❌ Decoding error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
@@ -93,7 +105,36 @@ class RepositoryService: RepositoryServiceProtocol {
                 }
             }
         }
-        
+
         task.resume()
+    }
+
+}
+
+extension RepositoryService {
+    func fetchLanguages(from urlString: String, completion: @escaping ([String: Int]?) -> Void) {
+        guard let url = URL(string: urlString) else {
+            completion(nil)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+
+        if let token = ProcessInfo.processInfo.environment["GITHUB_TOKEN"] {
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        session.dataTask(with: request) { data, response, error in
+            guard
+                let data = data,
+                let result = try? JSONDecoder().decode([String: Int].self, from: data)
+            else {
+                completion(nil)
+                return
+            }
+
+            completion(result)
+        }.resume()
     }
 }

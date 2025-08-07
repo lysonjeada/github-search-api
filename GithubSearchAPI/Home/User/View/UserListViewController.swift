@@ -29,6 +29,7 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         tableView.dataSource = self
         tableView.register(UserProfileCell.self, forCellReuseIdentifier: "UserProfileCell")
         tableView.register(ErrorCell.self, forCellReuseIdentifier: ErrorCell.reuseIdentifier)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
@@ -43,8 +44,7 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         searchBar.layer.shadowOffset = CGSize(width: 0, height: 2)
         searchBar.layer.shadowRadius = 4
         searchBar.layer.masksToBounds = false
-        let searchIcon = UIImage(systemName: "magnifyingglass")
-        searchBar.setImage(searchIcon, for: .search, state: .normal)
+        searchBar.setImage(imageSearchBar, for: .search, state: .normal)
         searchBar.showsCancelButton = false
         searchBar.showsBookmarkButton = false
         searchBar.showsSearchResultsButton = false
@@ -53,7 +53,13 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         searchBar.showsCancelButton = false
         searchBar.setShowsCancelButton(false, animated: false)
         searchBar.searchTextField.clearButtonMode = .whileEditing
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
+    }()
+    
+    private lazy var imageSearchBar: UIImage = {
+        let image = UIImage(systemName: "magnifyingglass")
+        return image ?? UIImage()
     }()
     
     init(interactor: UserListInteractorProtocol) {
@@ -67,10 +73,6 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "GitHub Users"
-        navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor.label
-        ]
         setupUI()
         interactor.loadInitialUsers()
     }
@@ -81,30 +83,25 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
             .foregroundColor: UIColor.label
         ]
         view.backgroundColor = .systemBackground
-
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 56))
         headerView.addSubview(searchBar)
+        view.addSubview(tableView)
+        
+        tableView.tableHeaderView = headerView
+
         NSLayoutConstraint.activate([
             searchBar.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 8),
             searchBar.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -8),
             searchBar.topAnchor.constraint(equalTo: headerView.topAnchor),
-            searchBar.bottomAnchor.constraint(equalTo: headerView.bottomAnchor)
-        ])
-        tableView.tableHeaderView = headerView
-
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
+            searchBar.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
+            
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
-
-
     
     // MARK: - UserListViewProtocol
     
@@ -202,15 +199,17 @@ extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedUser = users[indexPath.row]
-        let detailVC = UserDetailViewController(user: selectedUser)
-        navigationController?.pushViewController(detailVC, animated: true)
-        tableView.deselectRow(at: indexPath, animated: true)
+        if !showErrorCell {
+            let selectedUser = users[indexPath.row]
+            let detailVC = UserDetailViewController(user: selectedUser)
+            navigationController?.pushViewController(detailVC, animated: true)
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if showErrorCell && users.isEmpty {
-            return 200 // ou outro valor para a altura da célula de erro
+            return 200
         }
         return UITableView.automaticDimension
     }

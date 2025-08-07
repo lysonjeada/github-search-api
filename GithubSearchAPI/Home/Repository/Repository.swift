@@ -46,6 +46,7 @@ struct Repository: Decodable {
     let language: String?
     let forksCount: Int?
     let stargazersCount: Int?
+    var languages: [String: Int]? = nil
     
     enum CodingKeys: String, CodingKey {
         case id, name, owner, description, language, url

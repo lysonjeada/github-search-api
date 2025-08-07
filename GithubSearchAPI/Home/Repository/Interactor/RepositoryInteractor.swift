@@ -62,16 +62,25 @@ final class RepositoryInteractor: RepositoryInteractorProtocol {
     
     func searchUser(username: String) {
         searchService.searchUser(username: username) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.presenter.presentUserResult(result)
+            switch result {
+            case .success(let user):
+                self?.presenter.presentUserResult(user)
+            case .failure(let failure):
+                self?.presenter.presentError(failure.localizedDescription)
             }
+//            DispatchQueue.main.async {
+//                self?.presenter.presentUserResult(result)
+//            }
         }
     }
     
     func getRepository(owner: String, repoName: String) {
         searchService.getRepository(owner: owner, repoName: repoName) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.presenter.presentRepositoryResult(result)
+            switch result {
+            case .success(let repository):
+                self?.presenter.presentRepositoryResult(repository)
+            case .failure(let failure):
+                self?.presenter.presentError(failure.localizedDescription)
             }
         }
     }

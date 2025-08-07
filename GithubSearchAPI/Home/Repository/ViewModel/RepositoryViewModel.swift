@@ -18,6 +18,7 @@ struct RepositoryViewModel {
     let ownerName: String?
     let ownerAvatarUrl: URL?
     let htmlUrl: URL?
+    let language: [String: Int]?
 }
 
 struct GithubUserViewModel {

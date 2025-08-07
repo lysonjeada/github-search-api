@@ -10,7 +10,7 @@ import Foundation
 protocol UserListPresentationLogic: AnyObject {
     func presentUsers(_ users: [GitHubUser], isFirstPage: Bool)
     func presentError(_ error: Error)
-    func presentUserResult(_ result: Result<GitHubUser, SearchServiceError>)
+    func presentUserResult(_ user: GitHubUser)
 }
 
 final class UserListPresenter: UserListPresentationLogic {
@@ -21,9 +21,9 @@ final class UserListPresenter: UserListPresentationLogic {
             GithubUserViewModel(avatarURL: URL(string: user.avatarURL ?? ""),
                                 name: user.login ?? "",
                                 login: user.htmlURL ?? "",
-                                description: user.reposURL,
+                                description: user.bio ?? "",
                                 language: nil,
-                                publicRepos: nil,
+                                publicRepos: user.repos.count,
                                 following: nil,
                                 followers: nil
             )
@@ -36,23 +36,18 @@ final class UserListPresenter: UserListPresentationLogic {
         viewController?.displayError()
     }
     
-    func presentUserResult(_ result: Result<GitHubUser, SearchServiceError>) {
-        switch result {
-        case .success(let user):
-            guard let url = URL(string: user.avatarURL ?? "") else { return }
-            let userViewModel = GithubUserViewModel(
-                avatarURL: url,
-                name: user.name ?? "Sem nome",
-                login: user.login ?? "Sem login",
-                description: user.bio ?? "Sem biografia",
-                language: "",
-                publicRepos: user.publicRepos,
-                following: user.following,
-                followers: user.followers// opcional
-            )
-            viewController?.displayUserProfile(userViewModel)
-        case .failure(let error):
-            viewController?.displayError()
-        }
+    func presentUserResult(_ user: GitHubUser) {
+        guard let url = URL(string: user.avatarURL ?? "") else { return }
+        let userViewModel = GithubUserViewModel(
+            avatarURL: url,
+            name: user.name ?? "Sem nome",
+            login: user.login ?? "Sem login",
+            description: user.bio ?? "Sem biografia",
+            language: "",
+            publicRepos: user.publicRepos,
+            following: user.following,
+            followers: user.followers
+        )
+        viewController?.displayUserProfile(userViewModel)
     }
 }

@@ -35,6 +35,11 @@ final class UserProfileCell: UITableViewCell {
         let label = UILabel()
         return label
     }()
+    
+    private lazy var reposLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -47,6 +52,7 @@ final class UserProfileCell: UITableViewCell {
         titleLabel.text = viewModel.name
         ownerLabel.text = "🗣️ \(viewModel.login)"
         descriptionLabel.text = "✏️ \(viewModel.description ?? "")"
+        reposLabel.text = "\(viewModel.publicRepos ?? 0) repos públicos"
         if let language = viewModel.language {
             languageLabel.text = "🧠 \(language)"
         }
@@ -54,7 +60,7 @@ final class UserProfileCell: UITableViewCell {
     }
 
     private func setupLayout() {
-        [avatarImageView, titleLabel, ownerLabel, descriptionLabel, languageLabel].forEach {
+        [avatarImageView, titleLabel, ownerLabel, descriptionLabel, languageLabel, reposLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
@@ -80,9 +86,9 @@ final class UserProfileCell: UITableViewCell {
             descriptionLabel.topAnchor.constraint(equalTo: ownerLabel.bottomAnchor, constant: 4),
             descriptionLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
 
-            languageLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            languageLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 4),
-            languageLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
+            reposLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            reposLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 4),
+            reposLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
         ])
     }
 }

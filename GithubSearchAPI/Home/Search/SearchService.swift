@@ -21,6 +21,7 @@ enum SearchServiceError: Error {
     case noData
     case decodingError(Error)
     case notFound
+    case apiError(statusCode: Int)
 }
 
 class SearchService: SearchServiceProtocol {
@@ -120,8 +121,12 @@ extension SearchService {
 
         var request = URLRequest(url: url)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-        request.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
-        // request.setValue("Bearer YOUR_TOKEN", forHTTPHeaderField: "Authorization")
+        
+        if let token = ProcessInfo.processInfo.environment["GITHUB_TOKEN"] {
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        } else {
+            print("[SearchService] ⚠️ Token não encontrado. Configure no esquema ou variável de ambiente.")
+        }
 
         print("[SearchService] 🔍 Starting request for repository: \(owner)/\(repoName)")
 
@@ -143,6 +148,15 @@ extension SearchService {
             }
 
             print("[SearchService] ✅ Response status code: \(httpResponse.statusCode)")
+
+            guard (200...299).contains(httpResponse.statusCode) else {
+                let errorMessage = HTTPURLResponse.localizedString(forStatusCode: httpResponse.statusCode)
+                print("[SearchService] ❌ API returned error status: \(httpResponse.statusCode) - \(errorMessage)")
+                DispatchQueue.main.async {
+                    completion(.failure(.apiError(statusCode: httpResponse.statusCode)))
+                }
+                return
+            }
 
             guard let data = data else {
                 print("[SearchService] ❌ No data received")

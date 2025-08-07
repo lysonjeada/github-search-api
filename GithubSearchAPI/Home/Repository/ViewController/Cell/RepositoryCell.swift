@@ -25,18 +25,18 @@ final class RepositoryCell: UITableViewCell {
     
     private lazy var repositoryLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 20) // Negrito com tamanho 16
+        label.font = UIFont.boldSystemFont(ofSize: 20)
         label.textColor = .label // Cor preta (ou a cor primária do seu texto)
         label.numberOfLines = 1 // Uma linha só
-        label.adjustsFontSizeToFitWidth = true // Ajusta tamanho se necessário
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
 
     private lazy var ownerLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.italicSystemFont(ofSize: 18) // Itálico com tamanho 14
-        label.textColor = .systemGray // Cor cinza
-        label.numberOfLines = 1 // Uma linha só
+        label.font = UIFont.italicSystemFont(ofSize: 18)
+        label.textColor = .systemGray
+        label.numberOfLines = 1
         return label
     }()
     
@@ -62,7 +62,7 @@ final class RepositoryCell: UITableViewCell {
         repositoryLabel.text = viewModel.name
         ownerLabel.text = " 👤 \(viewModel.ownerName ?? "")"
         descriptionLabel.text = "✏️ \(viewModel.description ?? "")"
-        languageLabel.text = viewModel.isPrivate ?? false ? "🔐 Privado" : "🔓 Público"
+        languageLabel.text = viewModel.language?.keys.first ?? "No language"
         avatarImageView.load(url: viewModel.ownerAvatarUrl)
     }
 
@@ -93,7 +93,7 @@ final class RepositoryCell: UITableViewCell {
             ownerLabel.topAnchor.constraint(equalTo: languageLabel.topAnchor),
             ownerLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -12),
 
-            descriptionLabel.leadingAnchor.constraint(equalTo: repositoryLabel.leadingAnchor),
+            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 76),
             descriptionLabel.topAnchor.constraint(equalTo: languageLabel.bottomAnchor, constant: 8),
             descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
             descriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)

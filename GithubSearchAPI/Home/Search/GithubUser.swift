@@ -40,6 +40,7 @@ struct GitHubUser: Decodable {
     let following: Int?
     let createdAt: String?
     let updatedAt: String?
+    var repos: [RepositoryOwnerr] = []
 
     enum CodingKeys: String, CodingKey {
         case login
