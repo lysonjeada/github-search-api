@@ -53,8 +53,10 @@ final class UserProfileCell: UITableViewCell {
         if let followers = viewModel.followers {
             ownerLabel.text = "🗣️ \(followers) followers"
         }
-        descriptionLabel.text = "✏️ \(viewModel.description ?? "")"
-        reposLabel.text = "\(viewModel.publicRepos ?? 0) repos públicos"
+        if let description = viewModel.description {
+            descriptionLabel.text = "✏️ \(description == "" ? "No description" : description)"
+        }
+        reposLabel.text = "\(viewModel.publicRepos ?? 0) public repos"
         avatarImageView.load(url: viewModel.avatarURL)
     }
 

@@ -19,7 +19,7 @@ final class UserListInteractor: UserListInteractorProtocol {
     private let searchService: SearchServiceProtocol
     private let presenter: UserListPresentationLogic
     private var currentPage = 1
-    private let itemsPerPage = 5
+    private let itemsPerPage = 7
     private var isLoading = false
     private var hasMoreData = true
 
@@ -67,7 +67,6 @@ final class UserListInteractor: UserListInteractorProtocol {
                 case .failure(let failure):
                     self?.presenter.presentError(failure)
                 }
-                
             }
         }
     }

@@ -22,7 +22,8 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
     private let interactor: UserListInteractorProtocol
     private var githubUser: GithubUserViewModel?
     private var showErrorCell = false
-    
+    private var isCollectionViewMode = false
+
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -32,7 +33,21 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
-    
+
+    private lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(UserProfileCollectionViewCell.self, forCellWithReuseIdentifier: UserProfileCollectionViewCell.reuseIdentifier)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.isHidden = true
+        return collectionView
+    }()
+
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.delegate = self
@@ -56,21 +71,38 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
-    
+
     private lazy var imageSearchBar: UIImage = {
         let image = UIImage(systemName: "magnifyingglass")
         return image ?? UIImage()
     }()
+
+    private lazy var switchButton: UISwitch = {
+        let switchButton = UISwitch()
+        switchButton.onTintColor = .systemGreen
+        switchButton.translatesAutoresizingMaskIntoConstraints = false
+        switchButton.addTarget(self, action: #selector(toggleViewMode), for: .valueChanged)
+        return switchButton
+    }()
     
+    private lazy var switchLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Change to collection view"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 15)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
     init(interactor: UserListInteractorProtocol) {
         self.interactor = interactor
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -83,11 +115,32 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
             .foregroundColor: UIColor.label
         ]
         view.backgroundColor = .systemBackground
-        
+
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 56))
         headerView.addSubview(searchBar)
+
+        let switchContainer = UIView()
+        switchContainer.translatesAutoresizingMaskIntoConstraints = false
+        switchContainer.addSubview(switchLabel)
+        switchContainer.addSubview(switchButton)
+
         view.addSubview(tableView)
+        view.addSubview(collectionView)
+        view.addSubview(switchContainer)
         
+        NSLayoutConstraint.activate([
+            switchContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            switchContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            switchContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            switchContainer.heightAnchor.constraint(equalToConstant: 40),
+            
+            switchLabel.leadingAnchor.constraint(equalTo: switchContainer.leadingAnchor),
+            switchLabel.centerYAnchor.constraint(equalTo: switchContainer.centerYAnchor),
+            
+            switchButton.trailingAnchor.constraint(equalTo: switchContainer.trailingAnchor),
+            switchButton.centerYAnchor.constraint(equalTo: switchContainer.centerYAnchor)
+        ])
+
         tableView.tableHeaderView = headerView
 
         NSLayoutConstraint.activate([
@@ -95,16 +148,34 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
             searchBar.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -8),
             searchBar.topAnchor.constraint(equalTo: headerView.topAnchor),
             searchBar.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
-            
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+
+            tableView.topAnchor.constraint(equalTo: switchContainer.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+
+            collectionView.topAnchor.constraint(equalTo: switchContainer.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
-    
+
+    @objc private func toggleViewMode() {
+        isCollectionViewMode.toggle()
+        if isCollectionViewMode {
+            tableView.isHidden = true
+            collectionView.isHidden = false
+            collectionView.reloadData()
+        } else {
+            tableView.isHidden = false
+            collectionView.isHidden = true
+            tableView.reloadData()
+        }
+    }
+
     // MARK: - UserListViewProtocol
-    
+
     func displayUsers(_ newUsers: [GithubUserViewModel], isFirstPage: Bool) {
         showErrorCell = false
         if isFirstPage {
@@ -114,7 +185,11 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         }
         isLoading = false
         hasMoreData = !newUsers.isEmpty
-        tableView.reloadData()
+        if isCollectionViewMode {
+            collectionView.reloadData()
+        } else {
+            tableView.reloadData()
+        }
     }
 
     func displayUserProfile(_ user: GithubUserViewModel) {
@@ -123,14 +198,22 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         users = [user]
         isLoading = false
         hasMoreData = false
-        tableView.reloadData()
+        if isCollectionViewMode {
+            collectionView.reloadData()
+        } else {
+            tableView.reloadData()
+        }
     }
-    
+
     func displayError() {
         isLoading = false
         users = []
         showErrorCell = true
-        tableView.reloadData()
+        if isCollectionViewMode {
+            collectionView.reloadData()
+        } else {
+            tableView.reloadData()
+        }
     }
 }
 
@@ -141,18 +224,18 @@ extension UserListViewController: UISearchBarDelegate {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(performSearch), object: nil)
         perform(#selector(performSearch), with: nil, afterDelay: 0.5)
     }
-    
+
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
         currentQuery = searchBar.text ?? ""
         currentPage = 1
         performSearch()
     }
-    
+
     @objc private func performSearch() {
         isLoading = true
         let trimmedQuery = currentQuery.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         if trimmedQuery.isEmpty {
             currentPage = 1
             interactor.loadInitialUsers()
@@ -171,7 +254,7 @@ extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
         }
         return users.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if showErrorCell && users.isEmpty {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ErrorCell.reuseIdentifier, for: indexPath) as? ErrorCell else {
@@ -179,25 +262,14 @@ extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
             }
             return cell
         }
-        
+
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "UserProfileCell", for: indexPath) as? UserProfileCell else {
             return UITableViewCell()
         }
         cell.configure(with: users[indexPath.row])
         return cell
     }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.size.height
-        
-        if offsetY > contentHeight - height - 100, !isLoading, hasMoreData {
-            isLoading = true
-            interactor.loadMoreUsers()
-        }
-    }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if !showErrorCell {
             let selectedUser = users[indexPath.row]
@@ -206,12 +278,72 @@ extension UserListViewController: UITableViewDataSource, UITableViewDelegate {
             tableView.deselectRow(at: indexPath, animated: true)
         }
     }
-    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if showErrorCell && users.isEmpty {
             return 200
         }
         return UITableView.automaticDimension
     }
+}
 
+// MARK: - UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
+
+extension UserListViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if showErrorCell && users.isEmpty {
+            return 1
+        }
+        return users.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if showErrorCell && users.isEmpty {
+             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ErrorCell.reuseIdentifier, for: indexPath) as? ErrorCollectionViewCell else {
+                return UICollectionViewCell()
+             }
+            return cell
+        }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserProfileCollectionViewCell.reuseIdentifier, for: indexPath) as? UserProfileCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(with: users[indexPath.item])
+        return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width / 2.5
+        let height = collectionView.bounds.height - 20
+        return CGSize(width: width, height: height)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if !showErrorCell {
+            let selectedUser = users[indexPath.item]
+            let detailVC = UserDetailViewController(user: selectedUser)
+            navigationController?.pushViewController(detailVC, animated: true)
+        }
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView == collectionView {
+            let offsetX = scrollView.contentOffset.x
+            let contentWidth = scrollView.contentSize.width
+            let width = scrollView.frame.size.width
+
+            if offsetX > contentWidth - width - 100, !isLoading, hasMoreData, isCollectionViewMode {
+                isLoading = true
+                interactor.loadMoreUsers()
+            }
+        } else {
+            let offsetY = scrollView.contentOffset.y
+            let contentHeight = scrollView.contentSize.height
+            let height = scrollView.frame.size.height
+
+            if offsetY > contentHeight - height - 100, !isLoading, hasMoreData, !isCollectionViewMode {
+                isLoading = true
+                interactor.loadMoreUsers()
+            }
+        }
+    }
 }
