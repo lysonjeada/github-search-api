@@ -24,6 +24,47 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
     private var showErrorCell = false
     private var isCollectionViewMode = false
 
+    // MARK: - UI Components
+
+    private lazy var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.delegate = self
+        searchBar.placeholder = "Search users"
+        searchBar.searchBarStyle = .minimal
+        searchBar.backgroundImage = UIImage()
+        searchBar.layer.shadowColor = UIColor.black.cgColor
+        searchBar.layer.shadowOpacity = 0.1
+        searchBar.layer.shadowOffset = CGSize(width: 0, height: 2)
+        searchBar.layer.shadowRadius = 4
+        searchBar.layer.masksToBounds = false
+        searchBar.setImage(imageSearchBar, for: .search, state: .normal)
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        return searchBar
+    }()
+
+    private lazy var switchContainer: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var switchLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Change to collection view"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 15)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var switchButton: UISwitch = {
+        let switchButton = UISwitch()
+        switchButton.onTintColor = .systemGreen
+        switchButton.translatesAutoresizingMaskIntoConstraints = false
+        switchButton.addTarget(self, action: #selector(toggleViewMode), for: .valueChanged)
+        return switchButton
+    }()
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -43,55 +84,15 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(UserProfileCollectionViewCell.self, forCellWithReuseIdentifier: UserProfileCollectionViewCell.reuseIdentifier)
+        collectionView.register(ErrorCollectionViewCell.self, forCellWithReuseIdentifier: ErrorCollectionViewCell.reuseIdentifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.isHidden = true
         return collectionView
     }()
 
-    private lazy var searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
-        searchBar.delegate = self
-        searchBar.placeholder = "Search users"
-        searchBar.searchBarStyle = .minimal
-        searchBar.backgroundImage = UIImage()
-        searchBar.layer.shadowColor = UIColor.black.cgColor
-        searchBar.layer.shadowOpacity = 0.1
-        searchBar.layer.shadowOffset = CGSize(width: 0, height: 2)
-        searchBar.layer.shadowRadius = 4
-        searchBar.layer.masksToBounds = false
-        searchBar.setImage(imageSearchBar, for: .search, state: .normal)
-        searchBar.showsCancelButton = false
-        searchBar.showsBookmarkButton = false
-        searchBar.showsSearchResultsButton = false
-        searchBar.showsScopeBar = false
-        searchBar.showsBookmarkButton = false
-        searchBar.showsCancelButton = false
-        searchBar.setShowsCancelButton(false, animated: false)
-        searchBar.searchTextField.clearButtonMode = .whileEditing
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        return searchBar
-    }()
-
     private lazy var imageSearchBar: UIImage = {
         let image = UIImage(systemName: "magnifyingglass")
         return image ?? UIImage()
-    }()
-
-    private lazy var switchButton: UISwitch = {
-        let switchButton = UISwitch()
-        switchButton.onTintColor = .systemGreen
-        switchButton.translatesAutoresizingMaskIntoConstraints = false
-        switchButton.addTarget(self, action: #selector(toggleViewMode), for: .valueChanged)
-        return switchButton
-    }()
-    
-    private lazy var switchLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Change to collection view"
-        label.textColor = .label
-        label.font = .systemFont(ofSize: 15)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
     }()
 
     init(interactor: UserListInteractorProtocol) {
@@ -115,52 +116,49 @@ final class UserListViewController: UIViewController, UserListViewProtocol {
             .foregroundColor: UIColor.label
         ]
         view.backgroundColor = .systemBackground
-
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 56))
-        headerView.addSubview(searchBar)
-
-        let switchContainer = UIView()
-        switchContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(searchBar)
+        view.addSubview(switchContainer)
+        view.addSubview(tableView)
+        view.addSubview(collectionView)
+        
         switchContainer.addSubview(switchLabel)
         switchContainer.addSubview(switchButton)
 
-        view.addSubview(tableView)
-        view.addSubview(collectionView)
-        view.addSubview(switchContainer)
-        
         NSLayoutConstraint.activate([
-            switchContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            // searchBar
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            
+            // switchContainer
+            switchContainer.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
             switchContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             switchContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             switchContainer.heightAnchor.constraint(equalToConstant: 40),
             
+            // switchLabel
             switchLabel.leadingAnchor.constraint(equalTo: switchContainer.leadingAnchor),
             switchLabel.centerYAnchor.constraint(equalTo: switchContainer.centerYAnchor),
             
+            // switchButton
             switchButton.trailingAnchor.constraint(equalTo: switchContainer.trailingAnchor),
-            switchButton.centerYAnchor.constraint(equalTo: switchContainer.centerYAnchor)
-        ])
+            switchButton.centerYAnchor.constraint(equalTo: switchContainer.centerYAnchor),
 
-        tableView.tableHeaderView = headerView
-
-        NSLayoutConstraint.activate([
-            searchBar.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 8),
-            searchBar.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -8),
-            searchBar.topAnchor.constraint(equalTo: headerView.topAnchor),
-            searchBar.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
-
-            tableView.topAnchor.constraint(equalTo: switchContainer.bottomAnchor),
+            // tableView
+            tableView.topAnchor.constraint(equalTo: switchContainer.bottomAnchor, constant: 8),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 
-            collectionView.topAnchor.constraint(equalTo: switchContainer.bottomAnchor),
+            // collectionView
+            collectionView.topAnchor.constraint(equalTo: switchContainer.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -240),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
-
+    
     @objc private func toggleViewMode() {
         isCollectionViewMode.toggle()
         if isCollectionViewMode {
@@ -299,7 +297,7 @@ extension UserListViewController: UICollectionViewDataSource, UICollectionViewDe
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if showErrorCell && users.isEmpty {
-             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ErrorCell.reuseIdentifier, for: indexPath) as? ErrorCollectionViewCell else {
+             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ErrorCollectionViewCell.reuseIdentifier, for: indexPath) as? ErrorCollectionViewCell else {
                 return UICollectionViewCell()
              }
             return cell
@@ -312,9 +310,9 @@ extension UserListViewController: UICollectionViewDataSource, UICollectionViewDe
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.bounds.width / 2.5
-        let height = collectionView.bounds.height - 20
-        return CGSize(width: width, height: height)
+        let height = collectionView.bounds.height / 2
+        let width = (collectionView.bounds.width - 30) / 2
+        return CGSize(width: 200, height: 200)
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
