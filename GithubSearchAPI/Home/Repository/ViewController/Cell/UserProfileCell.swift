@@ -50,17 +50,16 @@ final class UserProfileCell: UITableViewCell {
 
     func configure(with viewModel: GithubUserViewModel) {
         titleLabel.text = viewModel.name
-        ownerLabel.text = "🗣️ \(viewModel.login)"
+        if let followers = viewModel.followers {
+            ownerLabel.text = "🗣️ \(followers) followers"
+        }
         descriptionLabel.text = "✏️ \(viewModel.description ?? "")"
         reposLabel.text = "\(viewModel.publicRepos ?? 0) repos públicos"
-        if let language = viewModel.language {
-            languageLabel.text = "🧠 \(language)"
-        }
         avatarImageView.load(url: viewModel.avatarURL)
     }
 
     private func setupLayout() {
-        [avatarImageView, titleLabel, ownerLabel, descriptionLabel, languageLabel, reposLabel].forEach {
+        [avatarImageView, titleLabel, ownerLabel, descriptionLabel, reposLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
